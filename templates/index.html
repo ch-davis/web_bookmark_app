@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的网页收藏</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="search-bar-wrapper">
+            <div class="search-icon"><i class="fas fa-search"></i></div>
+            
+            <select id="searchEngineSelect" class="search-engine-select">
+                <option value="my_bookmarks">我的收藏</option>
+                <option value="google">Google</option>
+                <option value="bing" selected>Bing</option> </select>
+
+            <form id="searchForm" action="/" method="GET" class="search-form" target="_blank"> <input type="text" name="q" placeholder="在 Bing 中搜索..." value="{{ search_query if search_query else '' }}">
+                <input type="hidden" name="engine" id="hiddenEngineInput" value="bing"> </form>
+            <div class="mic-icon"><i class="fas fa-microphone"></i></div>
+        </div>
+
+        <div class="bookmarks-grid">
+            {% for bookmark in bookmarks %}
+            <div class="bookmark-item">
+                <a href="{{ bookmark.url }}" target="_blank" class="bookmark-icon-wrapper" title="{{ bookmark.url }}">
+                    {% if bookmark.favicon_path %}
+                    <img src="{{ bookmark.favicon_path }}" alt="{{ bookmark.name }} Favicon" class="bookmark-favicon" onerror="this.onerror=null; this.style.display='none'; this.parentNode.querySelector('.bookmark-fa-icon').style.display='block';">
+                    <i class="{{ bookmark.fa_icon_class if bookmark.fa_icon_class else 'fas fa-globe' }} bookmark-fa-icon" style="display: none;"></i>
+                    {% else %}
+                    <i class="{{ bookmark.fa_icon_class if bookmark.fa_icon_class else 'fas fa-globe' }} bookmark-fa-icon"></i>
+                    {% endif %}
+                </a>
+                <p class="bookmark-name">{{ bookmark.name }}</p>
+                <div class="bookmark-actions">
+                    <a href="#" class="edit-icon" title="编辑" data-bookmark-id="{{ bookmark.id }}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="/delete/{{ bookmark.id }}" class="delete-icon" title="删除">
+                        <i class="fas fa-times-circle"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="bookmark-item add-shortcut">
+                <a href="#" class="bookmark-icon-wrapper add-shortcut-btn" title="添加快捷方式">
+                    <i class="fas fa-plus"></i>
+                </a>
+                <p class="bookmark-name">添加快捷方式</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="addBookmarkModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button close-add-modal">&times;</span>
+            <h2>添加新的收藏</h2>
+            <form action="/add" method="POST" class="modal-add-form">
+                <label for="bookmarkName">网页名称:</label>
+                <input type="text" id="bookmarkName" name="name" placeholder="请输入网页名称" required>
+                <label for="bookmarkUrl">网页链接 (URL):</label>
+                <input type="url" id="bookmarkUrl" name="url" placeholder="请输入完整的URL" required>
+                <label for="bookmarkFaIconClass">Font Awesome 图标类名 (可选):</label>
+                <input type="text" id="bookmarkFaIconClass" name="fa_icon_class" placeholder="例如: fas fa-link (默认: fas fa-globe)" value="fas fa-link">
+                <button type="submit">保存收藏</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editBookmarkModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button close-edit-modal">&times;</span>
+            <h2>编辑收藏</h2>
+            <form id="editBookmarkForm" method="POST" class="modal-edit-form">
+                <input type="hidden" id="editBookmarkId" name="id">
+                <label for="editBookmarkName">网页名称:</label>
+                <input type="text" id="editBookmarkName" name="name" placeholder="请输入网页名称" required>
+                <label for="editBookmarkUrl">网页链接 (URL):</label>
+                <input type="url" id="editBookmarkUrl" name="url" placeholder="请输入完整的URL" required>
+                <label for="editBookmarkFaIconClass">Font Awesome 图标类名 (可选):</label>
+                <input type="text" id="editBookmarkFaIconClass" name="fa_icon_class" placeholder="例如: fas fa-link">
+                <button type="submit">保存更改</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 获取添加模态框及其相关元素
+        var addModal = document.getElementById("addBookmarkModal");
+        var addBtn = document.querySelector(".add-shortcut-btn");
+        var closeAddBtn = document.querySelector(".close-add-modal");
+
+        // 获取编辑模态框及其相关元素
+        var editModal = document.getElementById("editBookmarkModal");
+        var closeEditBtn = document.querySelector(".close-edit-modal");
+        var editBookmarkForm = document.getElementById("editBookmarkForm");
+        var editBookmarkIdInput = document.getElementById("editBookmarkId");
+        var editBookmarkNameInput = document.getElementById("editBookmarkName");
+        var editBookmarkUrlInput = document.getElementById("editBookmarkUrl");
+        var editBookmarkFaIconClassInput = document.getElementById("editBookmarkFaIconClass"); // 新增：FA图标类名输入框
+        
+        var editIcons = document.querySelectorAll(".edit-icon"); // 获取所有编辑图标
+
+        // 显示添加模态框
+        if (addBtn) {
+            addBtn.onclick = function(event) {
+                event.preventDefault(); 
+                addModal.style.display = "flex"; 
+            }
+        }
+
+        // 关闭添加模态框
+        if (closeAddBtn) {
+            closeAddBtn.onclick = function() {
+                addModal.style.display = "none";
+            }
+        }
+
+        // 点击空白处关闭模态框
+        window.onclick = function(event) {
+            if (event.target == addModal) {
+                addModal.style.display = "none";
+            }
+            if (event.target == editModal) {
+                editModal.style.display = "none";
+            }
+        }
+
+        // 处理编辑图标点击事件
+        editIcons.forEach(icon => {
+            icon.addEventListener('click', function(event) {
+                event.preventDefault();
+                const bookmarkId = this.dataset.bookmarkId; // 获取书签ID
+                
+                // 通过 AJAX 请求获取书签数据
+                fetch(`/edit/${bookmarkId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        editBookmarkIdInput.value = data.id;
+                        editBookmarkNameInput.value = data.name;
+                        editBookmarkUrlInput.value = data.url;
+                        editBookmarkFaIconClassInput.value = data.fa_icon_class || ''; // 填充FA图标类名，如果为null则为空字符串
+                        editBookmarkForm.action = `/edit/${data.id}`; // 设置表单action
+                        editModal.style.display = "flex"; // 显示编辑模态框
+                    })
+                    .catch(error => console.error('Error fetching bookmark data:', error));
+            });
+        });
+
+        // 关闭编辑模态框
+        if (closeEditBtn) {
+            closeEditBtn.onclick = function() {
+                editModal.style.display = "none";
+            }
+        }
+
+
+        // 搜索引擎选择逻辑
+        const searchForm = document.getElementById('searchForm');
+        const searchEngineSelect = document.getElementById('searchEngineSelect');
+        const searchInput = searchForm.querySelector('input[name="q"]');
+        const hiddenEngineInput = document.getElementById('hiddenEngineInput');
+
+        const searchEngines = {
+            'my_bookmarks': '/',
+            'google': 'https://www.google.com/search',
+            'bing': 'https://www.bing.com/search'
+        };
+
+        // 从URL参数中获取当前选择的搜索引擎，并在页面加载时设置
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentEngine = urlParams.get('engine') || 'bing'; // 默认设置为 'bing'
+        
+        if (searchEngineSelect) {
+             searchEngineSelect.value = currentEngine;
+             searchForm.action = searchEngines[currentEngine];
+             hiddenEngineInput.value = currentEngine;
+
+             // 根据当前引擎设置placeholder
+             if (currentEngine === 'my_bookmarks') {
+                 searchInput.placeholder = '在我的收藏中搜索...';
+             } else if (currentEngine === 'google') {
+                 searchInput.placeholder = '在 Google 中搜索...';
+             } else if (currentEngine === 'bing') {
+                 searchInput.placeholder = '在 Bing 中搜索...';
+             }
+        }
+
+        searchEngineSelect.addEventListener('change', function() {
+            const selectedEngine = this.value;
+            searchForm.action = searchEngines[selectedEngine];
+            hiddenEngineInput.value = selectedEngine;
+
+            if (selectedEngine === 'my_bookmarks') {
+                searchInput.placeholder = '在我的收藏中搜索...';
+            } else if (selectedEngine === 'google') {
+                searchInput.placeholder = '在 Google 中搜索...';
+            } else if (selectedEngine === 'bing') {
+                searchInput.placeholder = '在 Bing 中搜索...';
+            }
+        });
+    </script>
+</body>
+</html>

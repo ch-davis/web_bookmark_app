@@ -1,0 +1,381 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa; /* 浅灰色背景，类似 Chrome */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: #f8f9fa; /* 与body背景一致 */
+    padding: 20px;
+    width: 100%;
+    max-width: 960px; /* 限制内容最大宽度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 使内容水平居中 */
+}
+
+/* 模拟 Chrome 搜索栏样式 */
+.search-bar-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 600px; /* 搜索栏宽度 */
+    background-color: #fff;
+    border-radius: 24px; /* 圆角胶囊形状 */
+    box-shadow: 0 1px 6px rgba(32,33,36,.28);
+    padding: 8px 12px;
+    margin-bottom: 50px; /* 与下方图标的间距 */
+    gap: 8px; /* 元素之间的间距 */
+}
+
+.search-icon, .mic-icon {
+    color: #5f6368;
+    font-size: 18px;
+    padding: 0 5px; /* 稍微调整内边距 */
+    flex-shrink: 0; /* 防止图标被压缩 */
+}
+
+/* 搜索引擎选择器样式 */
+.search-engine-select {
+    -webkit-appearance: none; /* 移除默认样式 (Chrome/Safari) */
+    -moz-appearance: none;    /* 移除默认样式 (Firefox) */
+    appearance: none;         /* 移除默认样式 */
+    background-color: #f0f0f0; /* 背景色 */
+    border: none;             /* 无边框 */
+    border-radius: 18px;      /* 圆角 */
+    padding: 6px 10px;        /* 内边距 */
+    font-size: 14px;
+    color: #5f6368;
+    cursor: pointer;
+    outline: none;            /* 移除聚焦轮廓 */
+    flex-shrink: 0;           /* 防止被压缩 */
+    position: relative; /* 允许自定义下拉箭头 */
+    padding-right: 25px; /* 为自定义箭头留出空间 */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#5f6368" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* 自定义下拉箭头 */
+    background-repeat: no-repeat;
+    background-position: right 5px center;
+    background-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+.search-engine-select:hover {
+    background-color: #e8eaed; /* 鼠标悬停时的背景 */
+}
+
+/* 搜索表单样式 */
+.search-form {
+    display: flex;
+    flex-grow: 1; /* 表单占据中间所有空间 */
+    align-items: center;
+}
+
+.search-form input[type="text"] {
+    flex: 1;
+    border: none; /* 移除输入框边框 */
+    outline: none; /* 移除聚焦边框 */
+    font-size: 16px;
+    padding: 5px 0; /* 调整内边距 */
+    background: transparent;
+    color: #333; /* 输入文本颜色 */
+}
+.search-form input[type="text"]::placeholder {
+    color: #80868b; /* 占位符颜色 */
+}
+
+/* 书签网格布局 */
+.bookmarks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* 响应式网格 */
+    gap: 20px 30px; /* 行和列之间的间距 */
+    justify-content: center; /* 网格内容居中 */
+    width: 100%;
+    padding: 0 20px; /* 左右内边距 */
+}
+
+.bookmark-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative; /* 用于定位删除图标 */
+    padding: 10px 5px; /* 内部填充 */
+    border-radius: 8px; /* 轻微圆角 */
+    transition: background-color 0.2s ease;
+}
+
+.bookmark-item:hover {
+    background-color: #f0f0f0; /* 鼠标悬停时的背景 */
+}
+
+/* 调整 bookmark-icon-wrapper，使其能更好地容纳 Favicon 和 Font Awesome 图标 */
+.bookmark-icon-wrapper {
+    width: 60px; /* 图标容器宽度 */
+    height: 60px; /* 图标容器高度 */
+    background-color: #f0f0f0; /* 图标背景色，或用特定颜色 */
+    border-radius: 50%; /* 圆形 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px; /* 与名称的间距 */
+    text-decoration: none; /* 移除下划线 */
+    color: #666; /* 默认图标颜色 */
+    font-size: 28px; /* 图标大小 */
+    font-weight: bold; /* 首字母加粗 */
+    overflow: hidden; /* 隐藏溢出内容，确保圆形 */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 添加一点阴影 */
+    position: relative; /* 确保 img 和 span 可以在里面定位 */
+}
+
+/* Favicon图片样式 */
+.bookmark-favicon {
+    width: 100%; /* 让图片填充整个容器 */
+    height: 100%;
+    object-fit: contain; /* 保持图片比例并适应容器 */
+    border-radius: 50%; /* 确保图片也是圆形 */
+}
+
+/* Font Awesome 回退图标样式 */
+.bookmark-fa-icon {
+    font-size: 28px; /* 与favicon容器大小匹配 */
+    color: #666; /* 默认图标颜色 */
+    position: absolute; /* 确保在容器内居中 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+/* 针对添加快捷方式按钮的特定样式 */
+.bookmark-item.add-shortcut .bookmark-icon-wrapper {
+    background-color: #e8f0fe; /* 浅蓝色背景 */
+    color: #1a73e8; /* 蓝色加号图标 */
+    font-size: 28px;
+}
+.bookmark-item.add-shortcut .bookmark-icon-wrapper i {
+    font-size: 24px; /* 调整加号图标大小 */
+}
+
+
+.bookmark-name {
+    margin: 0;
+    font-size: 13px;
+    color: #5f6368; /* 灰色文字 */
+    white-space: nowrap; /* 不换行 */
+    overflow: hidden; /* 溢出隐藏 */
+    text-overflow: ellipsis; /* 溢出显示省略号 */
+    max-width: 100px; /* 限制名称宽度 */
+}
+
+/* 收藏项操作容器，用于包含编辑和删除图标 */
+.bookmark-actions {
+    position: absolute;
+    top: -5px; /* 定位到右上角 */
+    right: -5px;
+    display: flex; /* 使用flex布局让图标并排 */
+    gap: 5px; /* 图标之间的间距 */
+    opacity: 0; /* 默认隐藏 */
+    visibility: hidden; /* 默认隐藏 */
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 10; /* 确保在最上层 */
+}
+
+.bookmark-item:hover .bookmark-actions {
+    opacity: 1; /* 鼠标悬停时显示 */
+    visibility: visible;
+}
+
+/* 编辑和删除图标的通用样式 */
+.edit-icon, .delete-icon {
+    background-color: #fff;
+    color: #80868b; /* 灰色图标 */
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px; /* 稍微小一点，以适应两个图标 */
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    text-decoration: none; /* 移除下划线 */
+}
+
+.edit-icon:hover, .delete-icon:hover {
+    color: #333; /* 鼠标悬停时颜色变深 */
+    background-color: #e8eaed; /* 鼠标悬停时的背景 */
+}
+
+
+/* 模态框 (Modal) 样式 */
+.modal {
+    display: none; /* 确保默认是隐藏的 */
+    position: fixed; /* 固定定位，覆盖整个屏幕 */
+    z-index: 100; /* 确保在最上层 */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* 允许滚动 */
+    background-color: rgba(0,0,0,0.4); /* 半透明黑色背景 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto; /* 自动边距居中 */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 400px; /* 模态框最大宽度 */
+    position: relative; /* 用于关闭按钮定位 */
+    animation-name: animatetop; /* 入场动画 */
+    animation-duration: 0.4s
+}
+
+/* 模态框入场动画 */
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 10px;
+    top: 5px;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.modal-add-form, .modal-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-add-form label, .modal-edit-form label {
+    font-weight: bold;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.modal-add-form input[type="text"],
+.modal-add-form input[type="url"],
+.modal-edit-form input[type="text"],
+.modal-edit-form input[type="url"] {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+    width: calc(100% - 30px); /* 减去内边距 */
+}
+
+.modal-add-form button, .modal-edit-form button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.modal-add-form button:hover, .modal-edit-form button:hover {
+    background-color: #0056b3;
+}
+
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .search-bar-wrapper {
+        flex-wrap: wrap; /* 允许选择器换行 */
+        justify-content: center; /* 居中对齐 */
+        padding: 8px;
+    }
+    .search-engine-select {
+        margin-bottom: 10px; /* 在小屏幕上提供间距 */
+    }
+    .search-icon, .mic-icon {
+        padding: 0 8px;
+    }
+    .bookmarks-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 15px 20px;
+    }
+    .bookmark-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+    .bookmark-name {
+        font-size: 12px;
+        max-width: 90px;
+    }
+    .search-bar-wrapper {
+        max-width: 90%;
+        margin-bottom: 30px;
+    }
+    .search-form input[type="text"] {
+        font-size: 14px;
+    }
+    .edit-icon, .delete-icon {
+        font-size: 12px; /* 调整小屏幕下图标大小 */
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .bookmarks-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px 15px;
+    }
+    .bookmark-icon-wrapper {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+    .bookmark-name {
+        font-size: 11px;
+        max-width: 75px;
+    }
+    .search-bar-wrapper {
+        padding: 5px 8px;
+    }
+    .search-icon, .mic-icon {
+        font-size: 16px;
+        padding: 0 5px;
+    }
+    .modal-content {
+        padding: 15px;
+    }
+    .modal-add-form input[type="text"],
+    .modal-add-form input[type="url"],
+    .modal-edit-form input[type="text"],
+    .modal-edit-form input[type="url"] {
+        width: calc(100% - 20px);
+    }
+}
